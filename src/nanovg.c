@@ -706,15 +706,26 @@ void nvgFillPaint(NVGcontext* ctx, NVGpaint paint)
 int nvgCreateImage(NVGcontext* ctx, const char* filename, int imageFlags)
 {
 	int w, h, n, image;
-	unsigned char* img;
+	unsigned char* img = 0;
 	stbi_set_unpremultiply_on_load(1);
 	stbi_convert_iphone_png_to_rgb(1);
-	img = stbi_load(filename, &w, &h, &n, 4);
+        if(imageFlags & NVG_IMAGE_SINGLE_CHANNEL)
+            img = stbi_load(filename, &w, &h, &n, 1);
+        else if(imageFlags & NVG_IMAGE_DUAL_CHANNEL)
+            img = stbi_load(filename, &w, &h, &n, 2);
+        else
+            img = stbi_load(filename, &w, &h, &n, 4);
 	if (img == NULL) {
 //		printf("Failed to load %s - %s\n", filename, stbi_failure_reason());
 		return 0;
 	}
-	image = nvgCreateImageRGBA(ctx, w, h, imageFlags, img);
+	
+	if(n ==4)
+            image = nvgCreateImageRGBA(ctx, w, h, imageFlags, img);
+        else if(n == 2)
+            image = nvgCreateImageRG(ctx, w, h, imageFlags, img);
+        else if(n == 1)
+            image = nvgCreateImageR(ctx, w, h, imageFlags, img);
 	stbi_image_free(img);
 	return image;
 }
@@ -735,6 +746,16 @@ int nvgCreateImageMem(NVGcontext* ctx, int imageFlags, unsigned char* data, int 
 int nvgCreateImageRGBA(NVGcontext* ctx, int w, int h, int imageFlags, const unsigned char* data)
 {
 	return ctx->params.renderCreateTexture(ctx->params.userPtr, NVG_TEXTURE_RGBA, w, h, imageFlags, data);
+}
+
+int nvgCreateImageRG(NVGcontext* ctx, int w, int h, int imageFlags, const unsigned char* data)
+{
+	return ctx->params.renderCreateTexture(ctx->params.userPtr, NVG_TEXTURE_RG, w, h, imageFlags, data);
+}
+
+int nvgCreateImageR(NVGcontext* ctx, int w, int h, int imageFlags, const unsigned char* data)
+{
+	return ctx->params.renderCreateTexture(ctx->params.userPtr, NVG_TEXTURE_R, w, h, imageFlags, data);
 }
 
 void nvgUpdateImage(NVGcontext* ctx, int image, const unsigned char* data)

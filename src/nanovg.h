@@ -121,6 +121,8 @@ enum NVGimageFlags {
 	NVG_IMAGE_REPEATY			= 1<<2,		// Repeat image in Y direction.
 	NVG_IMAGE_FLIPY				= 1<<3,		// Flips (inverses) image in Y direction when rendered.
 	NVG_IMAGE_PREMULTIPLIED		= 1<<4,		// Image data has premultiplied alpha.
+        NVG_IMAGE_SINGLE_CHANNEL       = 1<<5,         //load a single channel image
+        NVG_IMAGE_DUAL_CHANNEL          =1<<6,          //load a dual channel image
 };
 
 // Begin drawing a new frame
@@ -338,6 +340,12 @@ extern NVG_EXPORT int nvgCreateImageMem(NVGcontext* ctx, int imageFlags, unsigne
 // Creates image from specified image data.
 // Returns handle to the image.
 extern NVG_EXPORT int nvgCreateImageRGBA(NVGcontext* ctx, int w, int h, int imageFlags, const unsigned char* data);
+
+//Creates image from data and returns a handle to the image
+extern NVG_EXPORT int nvgCreateImageRG(NVGcontext* ctx, int w, int h, int imageFlags, const unsigned char* data);
+
+//Creates image from data and returns a handle to the image
+extern NVG_EXPORT int nvgCreateImageR(NVGcontext* ctx, int w, int h, int imageFlags, const unsigned char* data);
 
 // Updates image data specified by image handle.
 extern NVG_EXPORT void nvgUpdateImage(NVGcontext* ctx, int image, const unsigned char* data);
@@ -569,6 +577,8 @@ extern NVG_EXPORT int nvgTextBreakLines(NVGcontext* ctx, const char* string, con
 enum NVGtexture {
 	NVG_TEXTURE_ALPHA = 0x01,
 	NVG_TEXTURE_RGBA = 0x02,
+        NVG_TEXTURE_RG = 0x4,
+        NVG_TEXTURE_R = 0x8,
 };
 
 struct NVGscissor {
